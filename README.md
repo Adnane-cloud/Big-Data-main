@@ -1,4 +1,4 @@
-# Sujet 06 — Streaming musical (MongoDB + Spark)
+# Streaming musical (MongoDB + Spark)
 
 Les requêtes sont écrites en **MongoDB pur (MQL)**, un fichier `.mongodb` par requête, avec les
 commandes et opérateurs du cours : `insertOne/insertMany`, `find/findOne/countDocuments`, projection,

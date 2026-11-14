@@ -1,0 +1,6 @@
+// A16 — Écoutes par jour sur les 30 derniers jours (le champ jour est stocké dans chaque écoute)
+db.listens.aggregate([
+  { $match: { horodatage: { $gte: ISODate("2026-10-16T00:00:00Z") } } },
+  { $group: { _id: "$jour", ecoutes: { $sum: 1 } } },
+  { $sort: { _id: 1 } }
+], { comment: "A16" })

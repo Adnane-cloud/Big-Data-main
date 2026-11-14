@@ -1,0 +1,6 @@
+// T13 — Droit à l'effacement : supprimer toutes les écoutes d'un utilisateur (deleteMany)
+// On vérifie d'abord avec countDocuments (« toujours vérifier avant un deleteMany »).
+// Le compteur nb_ecoutes_total des titres est une statistique anonyme : il est conservé.
+db.listens.countDocuments({ utilisateur_id: "usr_000002" })
+
+db.listens.deleteMany({ utilisateur_id: "usr_000002" }, { comment: "T13" })

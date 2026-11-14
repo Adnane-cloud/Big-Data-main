@@ -1,0 +1,2 @@
+// T04 — 50 dernières écoutes d'un utilisateur : find + sort décroissant + limit
+db.listens.find({ utilisateur_id: "usr_000001" }, { _id: 0, titre_id: 1, horodatage: 1, appareil: 1 }).sort({ horodatage: -1 }).limit(50).comment("T04")

@@ -1,0 +1,26 @@
+// C01 — Effet des index : la même requête AVEC son index, puis SANS (index supprimé), puis on le recrée.
+// Le profiler mesure la durée et le nombre de documents lus (docsExamined).
+
+// --- T04 : 50 dernières écoutes d'un utilisateur ---
+db.listens.find({ utilisateur_id: "usr_000001" }).sort({ horodatage: -1 }).limit(50).comment("IDX_T04_avec")
+db.listens.dropIndex({ utilisateur_id: 1, horodatage: -1 })
+db.listens.find({ utilisateur_id: "usr_000001" }).sort({ horodatage: -1 }).limit(50).comment("IDX_T04_sans")
+db.listens.createIndex({ utilisateur_id: 1, horodatage: -1 })
+
+// --- T12 : playlists d'un utilisateur ---
+db.playlists.find({ proprietaire_id: "usr_001565" }).comment("IDX_T12_avec")
+db.playlists.dropIndex({ proprietaire_id: 1 })
+db.playlists.find({ proprietaire_id: "usr_001565" }).comment("IDX_T12_sans")
+db.playlists.createIndex({ proprietaire_id: 1 })
+
+// --- T14 : titres d'un artiste triés par année ---
+db.tracks.find({ artiste_id: "art_00001" }).sort({ "album.annee": 1 }).comment("IDX_T14_avec")
+db.tracks.dropIndex({ artiste_id: 1, "album.annee": 1 })
+db.tracks.find({ artiste_id: "art_00001" }).sort({ "album.annee": 1 }).comment("IDX_T14_sans")
+db.tracks.createIndex({ artiste_id: 1, "album.annee": 1 })
+
+// --- A24 : playlists publiques populaires (requête peu sélective) ---
+db.playlists.find({ publique: true, nb_abonnes: { $gt: 100 } }).sort({ nb_abonnes: -1 }).limit(20).comment("IDX_A24_avec")
+db.playlists.dropIndex({ publique: 1, nb_abonnes: -1 })
+db.playlists.find({ publique: true, nb_abonnes: { $gt: 100 } }).sort({ nb_abonnes: -1 }).limit(20).comment("IDX_A24_sans")
+db.playlists.createIndex({ publique: 1, nb_abonnes: -1 })

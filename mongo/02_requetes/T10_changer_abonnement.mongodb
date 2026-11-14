@@ -1,0 +1,2 @@
+// T10 — Changer l'abonnement d'un utilisateur : $set
+db.users.updateOne({ _id: "usr_000001" }, { $set: { abonnement: "famille" } }, { comment: "T10" })

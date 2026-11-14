@@ -1,0 +1,2 @@
+// T06 — Créer une playlist (MongoDB ajoute un _id)
+db.playlists.insertOne({ proprietaire_id: "usr_000001", nom: "Ma sélection", publique: true, titres: [], nb_abonnes: 0 }, { comment: "T06" })

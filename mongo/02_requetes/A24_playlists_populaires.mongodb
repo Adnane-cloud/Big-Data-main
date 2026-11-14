@@ -1,0 +1,4 @@
+// A24 — Playlists publiques de plus de 100 abonnés, les plus suivies d'abord
+db.playlists.countDocuments({ publique: true, nb_abonnes: { $gt: 100 } })
+
+db.playlists.find({ publique: true, nb_abonnes: { $gt: 100 } }, { nom: 1, nb_abonnes: 1 }).sort({ nb_abonnes: -1 }).limit(20).comment("A24")

@@ -1,0 +1,19 @@
+// R01 — Temps des requêtes, lus dans system.profile (rempli par le profiler) avec une agrégation :
+//   $match (opérations commentées) → $group par commentaire → $lookup (libellés) → $out (collection résultat)
+// millis = durée côté serveur en ms ; cpuNanos = temps CPU en nanosecondes (plus précis sous 1 ms)
+db.system.profile.aggregate([
+  { $match: { "command.comment": { $exists: true } } },
+  { $group: {
+      _id: "$command.comment",
+      ms: { $sum: "$millis" },
+      cpu_ns: { $sum: "$cpuNanos" },
+      nb_operations: { $sum: 1 },
+      nb_resultats: { $sum: "$nreturned" },
+      docs_examines: { $sum: "$docsExamined" } } },
+  { $lookup: { from: "catalogue_requetes", localField: "_id", foreignField: "_id", as: "catalogue" } },
+  { $addFields: { cpu_ms: { $divide: ["$cpu_ns", 1000000] } } },
+  { $sort: { _id: 1 } },
+  { $out: "benchmark_results" }
+])
+
+db.benchmark_results.find({}, { ms: 1, cpu_ms: 1, nb_operations: 1, docs_examines: 1, "catalogue.description": 1 }).limit(100)

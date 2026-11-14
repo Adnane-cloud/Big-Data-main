@@ -1,0 +1,2 @@
+// T15 — Nombre total d'écoutes d'un titre : lecture du compteur nb_ecoutes_total (findOne + projection)
+db.tracks.findOne({ _id: "trk_000001" }, { titre: 1, nb_ecoutes_total: 1 }, { comment: "T15" })

@@ -1,0 +1,9 @@
+// T01 — Enregistrer une écoute : insertOne, puis +1 sur le compteur du titre ($inc)
+// artiste_id, genre et pays sont recopiés dans l'écoute (données lues ensemble → imbrication)
+db.listens.insertOne({
+  utilisateur_id: "usr_000001", titre_id: "trk_000001", artiste_id: "art_00649", genre: "Electro", pays: "JP",
+  horodatage: ISODate("2026-11-14T20:30:00Z"), jour: "2026-11-14", heure: 20,
+  duree_ecoutee: 210, appareil: "smartphone", source: "album", sautee: 0
+}, { comment: "T01" })
+
+db.tracks.updateOne({ _id: "trk_000001" }, { $inc: { nb_ecoutes_total: 1 } }, { comment: "T01" })

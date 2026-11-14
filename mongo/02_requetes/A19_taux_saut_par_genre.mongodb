@@ -1,0 +1,6 @@
+// A19 — Taux de titres sautés par genre (sautee vaut 1 ou 0 : sa somme = nombre de sauts)
+db.listens.aggregate([
+  { $group: { _id: "$genre", total: { $sum: 1 }, sautes: { $sum: "$sautee" } } },
+  { $addFields: { taux_saut_pct: { $multiply: [{ $divide: ["$sautes", "$total"] }, 100] } } },
+  { $sort: { taux_saut_pct: -1 } }
+], { comment: "A19" })

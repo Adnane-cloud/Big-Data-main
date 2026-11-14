@@ -1,0 +1,10 @@
+// C02 — Effet de la modélisation sur A19 :
+//   1) genre recopié dans chaque écoute (imbrication)  2) genre récupéré par $lookup vers tracks (référence)
+db.listens.aggregate([
+  { $group: { _id: "$genre", total: { $sum: 1 }, sautes: { $sum: "$sautee" } } }
+], { comment: "MOD_A19_imbrique" })
+
+db.listens.aggregate([
+  { $lookup: { from: "tracks", localField: "titre_id", foreignField: "_id", as: "titre" } },
+  { $group: { _id: "$titre.genre", total: { $sum: 1 }, sautes: { $sum: "$sautee" } } }
+], { comment: "MOD_A19_lookup" })

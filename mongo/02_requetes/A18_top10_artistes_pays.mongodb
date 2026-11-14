@@ -1,0 +1,9 @@
+// A18 — Top 10 des artistes d'un pays (ici le Maroc), selon le pays des auditeurs
+db.listens.aggregate([
+  { $match: { pays: "MA" } },
+  { $group: { _id: "$artiste_id", ecoutes: { $sum: 1 } } },
+  { $sort: { ecoutes: -1 } },
+  { $limit: 10 },
+  { $lookup: { from: "artists", localField: "_id", foreignField: "_id", as: "artiste" } },
+  { $project: { ecoutes: 1, "artiste.nom": 1 } }
+], { comment: "A18" })

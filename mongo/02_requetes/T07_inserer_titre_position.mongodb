@@ -1,0 +1,8 @@
+// T07 — Insérer un titre en 3e position d'une playlist : $push avec $each et $position
+// ($position : indice dans le tableau, 0 = début, donc 2 = 3e place)
+db.playlists.updateOne(
+  { _id: "ply_000001" },
+  { $push: { titres: { $each: [{ titre_id: "trk_000042", ajoute_le: ISODate("2026-11-14T20:00:00Z") }], $position: 2 } } },
+  { comment: "T07" })
+
+db.playlists.findOne({ _id: "ply_000001" }, { titres: 1 })

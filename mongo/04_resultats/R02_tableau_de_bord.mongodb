@@ -1,0 +1,61 @@
+// R02 — Résultats de A16 à A25 enregistrés pour le tableau de bord ($out = écrire le résultat dans une collection)
+
+db.listens.aggregate([
+  { $match: { horodatage: { $gte: ISODate("2026-10-16T00:00:00Z") } } },
+  { $group: { _id: "$jour", ecoutes: { $sum: 1 } } },
+  { $sort: { _id: 1 } },
+  { $out: "dash_ecoutes_par_jour" }
+])
+
+db.listens.aggregate([
+  { $match: { horodatage: { $gte: ISODate("2026-11-08T00:00:00Z") } } },
+  { $group: { _id: "$titre_id", ecoutes: { $sum: 1 } } },
+  { $sort: { ecoutes: -1 } },
+  { $limit: 10 },
+  { $lookup: { from: "tracks", localField: "_id", foreignField: "_id", as: "titre" } },
+  { $project: { ecoutes: 1, "titre.titre": 1, "titre.artiste_nom": 1 } },
+  { $out: "dash_top_titres_semaine" }
+])
+
+db.listens.aggregate([
+  { $match: { pays: "MA" } },
+  { $group: { _id: "$artiste_id", ecoutes: { $sum: 1 } } },
+  { $sort: { ecoutes: -1 } },
+  { $limit: 10 },
+  { $lookup: { from: "artists", localField: "_id", foreignField: "_id", as: "artiste" } },
+  { $project: { ecoutes: 1, "artiste.nom": 1 } },
+  { $out: "dash_top_artistes_ma" }
+])
+
+db.listens.aggregate([
+  { $group: { _id: "$genre", total: { $sum: 1 }, sautes: { $sum: "$sautee" } } },
+  { $addFields: { taux_saut_pct: { $multiply: [{ $divide: ["$sautes", "$total"] }, 100] } } },
+  { $sort: { taux_saut_pct: -1 } },
+  { $out: "dash_saut_par_genre" }
+])
+
+db.listens.aggregate([
+  { $group: { _id: "$appareil", duree_moyenne_s: { $avg: "$duree_ecoutee" }, ecoutes: { $sum: 1 } } },
+  { $sort: { duree_moyenne_s: -1 } },
+  { $out: "dash_duree_par_appareil" }
+])
+
+db.users.aggregate([
+  { $group: { _id: { pays: "$pays", abonnement: "$abonnement" }, utilisateurs: { $sum: 1 } } },
+  { $sort: { "_id.pays": 1, "_id.abonnement": 1 } },
+  { $out: "dash_users_abonnement_pays" }
+])
+
+db.listens.aggregate([
+  { $group: { _id: "$heure", ecoutes: { $sum: 1 } } },
+  { $sort: { _id: 1 } },
+  { $out: "dash_ecoutes_par_heure" }
+])
+
+db.tracks.aggregate([
+  { $match: { "album.annee": 2020 } },
+  { $group: { _id: { album: "$album.titre", artiste: "$artiste_nom" }, nb_titres: { $sum: 1 }, ecoutes: { $sum: "$nb_ecoutes_total" } } },
+  { $sort: { ecoutes: -1 } },
+  { $limit: 20 },
+  { $out: "dash_albums_2020" }
+])

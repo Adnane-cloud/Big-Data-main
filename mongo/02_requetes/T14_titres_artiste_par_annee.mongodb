@@ -1,0 +1,2 @@
+// T14 — Titres d'un artiste triés par année de l'album (notation pointée "album.annee")
+db.tracks.find({ artiste_id: "art_00001" }, { titre: 1, "album.titre": 1, "album.annee": 1 }).sort({ "album.annee": 1 }).comment("T14")

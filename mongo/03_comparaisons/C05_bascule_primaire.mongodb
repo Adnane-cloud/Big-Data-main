@@ -1,0 +1,11 @@
+// C05 — Bascule du primaire (« panne du primaire : élection automatique d'un nouveau primaire »)
+// À lancer en dernier.
+
+// 1) Qui est primaire ?
+rs.status().members
+
+// 2) Une écriture confirmée par la majorité avant la bascule
+db.test_bascule.insertOne({ avant_bascule: true, date: new Date() }, { writeConcern: { w: "majority" } })
+
+// 3) Le primaire cède sa place pendant 30 s : les secondaires élisent un nouveau primaire
+rs.stepDown(30)

@@ -1,0 +1,5 @@
+// A20 — Durée moyenne d'écoute par appareil
+db.listens.aggregate([
+  { $group: { _id: "$appareil", duree_moyenne_s: { $avg: "$duree_ecoutee" }, ecoutes: { $sum: 1 } } },
+  { $sort: { duree_moyenne_s: -1 } }
+], { comment: "A20" })

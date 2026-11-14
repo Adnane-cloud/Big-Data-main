@@ -1,0 +1,5 @@
+// A22 — Écoutes par heure de la journée (le champ heure est stocké dans chaque écoute)
+db.listens.aggregate([
+  { $group: { _id: "$heure", ecoutes: { $sum: 1 } } },
+  { $sort: { _id: 1 } }
+], { comment: "A22" })

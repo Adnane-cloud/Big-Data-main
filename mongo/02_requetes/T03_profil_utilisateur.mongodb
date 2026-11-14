@@ -1,0 +1,2 @@
+// T03 — Profil d'un utilisateur : findOne sur _id
+db.users.findOne({ _id: "usr_000001" }, {}, { comment: "T03" })

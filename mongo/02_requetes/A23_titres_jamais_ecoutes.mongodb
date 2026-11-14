@@ -1,0 +1,4 @@
+// A23 — Titres jamais écoutés : compteur nb_ecoutes_total égal à 0
+db.tracks.countDocuments({ nb_ecoutes_total: 0 })
+
+db.tracks.find({ nb_ecoutes_total: 0 }, { titre: 1, artiste_nom: 1 }).limit(20).comment("A23")

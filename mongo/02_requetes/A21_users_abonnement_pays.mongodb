@@ -1,0 +1,5 @@
+// A21 — Utilisateurs par abonnement et par pays (regroupement sur deux champs)
+db.users.aggregate([
+  { $group: { _id: { pays: "$pays", abonnement: "$abonnement" }, utilisateurs: { $sum: 1 } } },
+  { $sort: { "_id.pays": 1, "_id.abonnement": 1 } }
+], { comment: "A21" })

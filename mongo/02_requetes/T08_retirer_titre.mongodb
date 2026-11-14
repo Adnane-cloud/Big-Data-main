@@ -1,0 +1,2 @@
+// T08 — Retirer un titre d'une playlist : $pull
+db.playlists.updateOne({ _id: "ply_000001" }, { $pull: { titres: { titre_id: "trk_000042" } } }, { comment: "T08" })

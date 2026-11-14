@@ -1,0 +1,126 @@
+# =============================================================================
+# Infrastructure du projet : replica set MongoDB (3 nœuds) + cluster Spark (1 master, 2 workers) + Streamlit
+# Lancement : depuis la racine du projet ->  docker compose -f docker/docker-compose.yml up -d --build
+# =============================================================================
+services:
+
+  # ---------------------------------------------------------------------------
+  # MONGODB — replica set rs0 (3 nœuds). mongo1 a la priorité 2 (primaire préféré).
+  # Les fichiers de requêtes MongoDB (dossier mongo/) sont montés dans /scripts,
+  # les exports pour Streamlit sortent dans dashboard/data via /export.
+  # ---------------------------------------------------------------------------
+  mongo1:
+    image: mongo:7.0
+    container_name: mongo1
+    command: ["mongod", "--replSet", "rs0", "--bind_ip_all", "--port", "27017"]
+    ports: ["27017:27017"]
+    volumes:
+      - mongo1_data:/data/db
+      - ../mongo:/scripts
+      - ../dashboard/data:/export
+    networks: [bigdata-net]
+
+  mongo2:
+    image: mongo:7.0
+    container_name: mongo2
+    command: ["mongod", "--replSet", "rs0", "--bind_ip_all", "--port", "27018"]
+    ports: ["27018:27018"]
+    volumes:
+      - mongo2_data:/data/db
+      - ../mongo:/scripts
+    networks: [bigdata-net]
+
+  mongo3:
+    image: mongo:7.0
+    container_name: mongo3
+    command: ["mongod", "--replSet", "rs0", "--bind_ip_all", "--port", "27019"]
+    ports: ["27019:27019"]
+    volumes:
+      - mongo3_data:/data/db
+      - ../mongo:/scripts
+    networks: [bigdata-net]
+
+  # Initialisation automatique du replica set (s'exécute une fois puis s'arrête)
+  mongo-init:
+    image: mongo:7.0
+    container_name: mongo-init
+    depends_on: [mongo1, mongo2, mongo3]
+    restart: "no"
+    networks: [bigdata-net]
+    entrypoint:
+      - bash
+      - -c
+      - |
+        until mongosh --quiet --host mongo1:27017 --eval 'db.adminCommand({ping:1})' >/dev/null 2>&1; do sleep 2; done
+        mongosh --quiet --host mongo1:27017 --eval '
+          try { rs.status(); print("Replica set deja initialise"); }
+          catch (e) {
+            rs.initiate({ _id: "rs0", members: [
+              { _id: 0, host: "mongo1:27017", priority: 2 },
+              { _id: 1, host: "mongo2:27018", priority: 1 },
+              { _id: 2, host: "mongo3:27019", priority: 1 } ] });
+            print("Replica set rs0 initialise");
+          }'
+
+  # ---------------------------------------------------------------------------
+  # SPARK — 1 master + 2 workers. Connecteur MongoDB chargé au lancement (--packages).
+  # ---------------------------------------------------------------------------
+  spark-master:
+    build: { context: ., dockerfile: spark.Dockerfile }
+    image: projet-spark:3.5.3
+    container_name: spark-master
+    hostname: spark-master
+    command: /opt/spark/bin/spark-class org.apache.spark.deploy.master.Master
+    environment:
+      - SPARK_MASTER_HOST=spark-master
+    ports: ["8085:8080", "7077:7077", "4040:4040"]
+    volumes:
+      - ../spark:/opt/spark/apps
+    networks: [bigdata-net]
+
+  spark-worker-1:
+    build: { context: ., dockerfile: spark.Dockerfile }
+    image: projet-spark:3.5.3
+    container_name: spark-worker-1
+    depends_on: [spark-master]
+    command: /opt/spark/bin/spark-class org.apache.spark.deploy.worker.Worker spark://spark-master:7077
+    environment:
+      - SPARK_WORKER_CORES=2
+      - SPARK_WORKER_MEMORY=2G
+      - SPARK_WORKER_WEBUI_PORT=8081
+    ports: ["8081:8081"]
+    networks: [bigdata-net]
+
+  spark-worker-2:
+    build: { context: ., dockerfile: spark.Dockerfile }
+    image: projet-spark:3.5.3
+    container_name: spark-worker-2
+    depends_on: [spark-master]
+    command: /opt/spark/bin/spark-class org.apache.spark.deploy.worker.Worker spark://spark-master:7077
+    environment:
+      - SPARK_WORKER_CORES=2
+      - SPARK_WORKER_MEMORY=2G
+      - SPARK_WORKER_WEBUI_PORT=8082
+    ports: ["8082:8082"]
+    networks: [bigdata-net]
+
+  # ---------------------------------------------------------------------------
+  # TABLEAU DE BORD STREAMLIT — http://localhost:8501 (lit les JSON de dashboard/data)
+  # ---------------------------------------------------------------------------
+  dashboard:
+    build: { context: ../dashboard, dockerfile: ../docker/dashboard.Dockerfile }
+    image: projet-dashboard:1.0
+    container_name: dashboard
+    ports: ["8501:8501"]
+    volumes:
+      - ../dashboard:/app
+    networks: [bigdata-net]
+
+networks:
+  bigdata-net:
+    driver: bridge
+
+volumes:
+  mongo1_data:
+  mongo2_data:
+  mongo3_data:

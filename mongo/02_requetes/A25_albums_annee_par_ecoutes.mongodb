@@ -1,0 +1,7 @@
+// A25 — Albums de l'année 2020 triés par nombre d'écoutes (somme des compteurs de leurs titres)
+db.tracks.aggregate([
+  { $match: { "album.annee": 2020 } },
+  { $group: { _id: { album: "$album.titre", artiste: "$artiste_nom" }, nb_titres: { $sum: 1 }, ecoutes: { $sum: "$nb_ecoutes_total" } } },
+  { $sort: { ecoutes: -1 } },
+  { $limit: 20 }
+], { comment: "A25" })

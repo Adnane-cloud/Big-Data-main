@@ -1,0 +1,2 @@
+// T11 — Ajouter un genre préféré sans doublon : $addToSet (le tableau se comporte comme un ensemble)
+db.users.updateOne({ _id: "usr_000001" }, { $addToSet: { genres_preferes: "Gnaoua" } }, { comment: "T11" })

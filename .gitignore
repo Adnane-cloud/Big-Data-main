@@ -1,0 +1,10 @@
+# Fichiers générés à l'exécution
+resultats_execution.log
+__pycache__/
+*.pyc
+.ivy2/
+
+# Fichiers temporaires Word / systèmes
+~$*
+.DS_Store
+Thumbs.db

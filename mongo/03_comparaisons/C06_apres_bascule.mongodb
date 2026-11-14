@@ -1,0 +1,12 @@
+// C06 — Après la bascule : nouveau primaire, informations d'élection, aucune écriture perdue
+
+rs.status().members
+
+// Informations enregistrées par MongoDB sur l'élection (date d'élection, date de reprise des écritures)
+rs.status().electionCandidateMetrics
+
+// L'écriture faite avant la bascule est toujours là, et on peut écrire sur le nouveau primaire
+db.test_bascule.find()
+db.test_bascule.insertOne({ apres_bascule: true, date: new Date() }, { writeConcern: { w: "majority" } })
+db.test_bascule.countDocuments({})
+db.test_bascule.drop()

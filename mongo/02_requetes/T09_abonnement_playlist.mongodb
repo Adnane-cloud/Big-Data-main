@@ -1,0 +1,2 @@
+// T09 — S'abonner à une playlist : compteur nb_abonnes + 1 ($inc)
+db.playlists.updateOne({ _id: "ply_000001" }, { $inc: { nb_abonnes: 1 } }, { comment: "T09" })

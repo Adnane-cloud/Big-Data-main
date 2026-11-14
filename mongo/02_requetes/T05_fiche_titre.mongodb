@@ -1,0 +1,6 @@
+// T05 — Fiche d'un titre avec son artiste et son album
+// L'album est imbriqué dans le titre ; l'artiste (référence) est joint par $lookup
+db.tracks.aggregate([
+  { $match: { _id: "trk_000001" } },
+  { $lookup: { from: "artists", localField: "artiste_id", foreignField: "_id", as: "artiste" } }
+], { comment: "T05" })

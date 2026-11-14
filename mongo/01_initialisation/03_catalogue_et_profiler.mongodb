@@ -1,0 +1,60 @@
+// =============================================================================
+// 03 — Catalogue des requêtes + activation du profiler (mesure des temps exigée par le sujet)
+// Le profiler est l'outil de MongoDB qui enregistre chaque opération et sa durée (millis)
+// dans la collection system.profile. Chaque requête porte un commentaire (comment: "T04")
+// pour retrouver sa durée.
+// =============================================================================
+
+db.catalogue_requetes.drop()
+db.catalogue_requetes.insertMany([
+  {"_id": "T01", "categorie": "transactionnelle", "description": "Enregistrer une écoute"},
+  {"_id": "T02", "categorie": "transactionnelle", "description": "Importer 10 000 écoutes en lot"},
+  {"_id": "T03", "categorie": "transactionnelle", "description": "Profil d'un utilisateur"},
+  {"_id": "T04", "categorie": "transactionnelle", "description": "50 dernières écoutes d'un utilisateur"},
+  {"_id": "T05", "categorie": "transactionnelle", "description": "Fiche titre + artiste + album"},
+  {"_id": "T06", "categorie": "transactionnelle", "description": "Créer une playlist"},
+  {"_id": "T07", "categorie": "transactionnelle", "description": "Insérer un titre à une position"},
+  {"_id": "T08", "categorie": "transactionnelle", "description": "Retirer un titre d'une playlist"},
+  {"_id": "T09", "categorie": "transactionnelle", "description": "S'abonner à une playlist (compteur)"},
+  {"_id": "T10", "categorie": "transactionnelle", "description": "Changer l'abonnement"},
+  {"_id": "T11", "categorie": "transactionnelle", "description": "Ajouter un genre préféré"},
+  {"_id": "T12", "categorie": "transactionnelle", "description": "Playlists d'un utilisateur"},
+  {"_id": "T13", "categorie": "transactionnelle", "description": "Effacer l'historique d'un utilisateur"},
+  {"_id": "T14", "categorie": "transactionnelle", "description": "Titres d'un artiste triés par année"},
+  {"_id": "T15", "categorie": "transactionnelle", "description": "Nombre total d'écoutes d'un titre"},
+  {"_id": "A16", "categorie": "analytique", "description": "Écoutes par jour sur 30 jours"},
+  {"_id": "A17", "categorie": "analytique", "description": "Top 10 des titres de la semaine"},
+  {"_id": "A18", "categorie": "analytique", "description": "Top 10 des artistes d'un pays (MA)"},
+  {"_id": "A19", "categorie": "analytique", "description": "Taux de titres sautés par genre"},
+  {"_id": "A20", "categorie": "analytique", "description": "Durée moyenne d'écoute par appareil"},
+  {"_id": "A21", "categorie": "analytique", "description": "Utilisateurs par abonnement et par pays"},
+  {"_id": "A22", "categorie": "analytique", "description": "Écoutes par heure de la journée"},
+  {"_id": "A23", "categorie": "analytique", "description": "Titres jamais écoutés"},
+  {"_id": "A24", "categorie": "analytique", "description": "Playlists publiques de plus de 100 abonnés"},
+  {"_id": "A25", "categorie": "analytique", "description": "Albums de 2020 triés par écoutes"},
+  {"_id": "IDX_T04_avec", "categorie": "indexation", "description": "T04 — avec index"},
+  {"_id": "IDX_T04_sans", "categorie": "indexation", "description": "T04 — sans index"},
+  {"_id": "IDX_T12_avec", "categorie": "indexation", "description": "T12 — avec index"},
+  {"_id": "IDX_T12_sans", "categorie": "indexation", "description": "T12 — sans index"},
+  {"_id": "IDX_T14_avec", "categorie": "indexation", "description": "T14 — avec index"},
+  {"_id": "IDX_T14_sans", "categorie": "indexation", "description": "T14 — sans index"},
+  {"_id": "IDX_A24_avec", "categorie": "indexation", "description": "A24 — avec index"},
+  {"_id": "IDX_A24_sans", "categorie": "indexation", "description": "A24 — sans index"},
+  {"_id": "MOD_A19_imbrique", "categorie": "indexation", "description": "A19 avec le genre recopié dans listens"},
+  {"_id": "MOD_A19_lookup", "categorie": "indexation", "description": "A19 avec $lookup vers tracks"},
+  {"_id": "W1_3n", "categorie": "coherence", "description": "10 insertOne w:1 (3 nœuds)"},
+  {"_id": "WMAJ_3n", "categorie": "coherence", "description": "10 insertOne w:majority (3 nœuds)"},
+  {"_id": "W3_3n", "categorie": "coherence", "description": "1 insertOne w:3 (3 nœuds)"},
+  {"_id": "RLOCAL_3n", "categorie": "coherence", "description": "10 lectures readConcern local (3 nœuds)"},
+  {"_id": "RMAJ_3n", "categorie": "coherence", "description": "10 lectures readConcern majority (3 nœuds)"},
+  {"_id": "W1_2n", "categorie": "coherence", "description": "10 insertOne w:1 (2 nœuds)"},
+  {"_id": "WMAJ_2n", "categorie": "coherence", "description": "10 insertOne w:majority (2 nœuds)"},
+  {"_id": "W3_2n", "categorie": "coherence", "description": "1 insertOne w:3 (2 nœuds)"},
+  {"_id": "RLOCAL_2n", "categorie": "coherence", "description": "10 lectures readConcern local (2 nœuds)"},
+  {"_id": "RMAJ_2n", "categorie": "coherence", "description": "10 lectures readConcern majority (2 nœuds)"}
+])
+
+db.setProfilingLevel(0)
+db.system.profile.drop()
+db.createCollection("system.profile", { capped: true, size: 104857600 })
+db.setProfilingLevel(2)

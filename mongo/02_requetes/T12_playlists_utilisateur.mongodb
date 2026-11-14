@@ -1,0 +1,2 @@
+// T12 — Playlists d'un utilisateur : find + projection
+db.playlists.find({ proprietaire_id: "usr_001565" }, { nom: 1, publique: 1, nb_abonnes: 1 }).comment("T12")

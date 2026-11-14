@@ -1,0 +1,16 @@
+// =============================================================================
+// 02 — Index (exigés par le sujet : « clés, index et justification de chaque requête »)
+// Sans index, MongoDB lit toute la collection. Chaque index sert une requête précise.
+// L'index sur _id existe déjà : il sert T03, T05, T07 à T11 et T15.
+// =============================================================================
+
+db.listens.createIndex({ utilisateur_id: 1, horodatage: -1 })   // T04 (50 dernières écoutes), T13
+db.listens.createIndex({ horodatage: -1 })                      // A16, A17 (période)
+db.listens.createIndex({ pays: 1 })                             // A18 (artistes d'un pays)
+db.tracks.createIndex({ artiste_id: 1, "album.annee": 1 })      // T14 (titres d'un artiste par année)
+db.tracks.createIndex({ "album.annee": 1 })                     // A25 (albums d'une année)
+db.tracks.createIndex({ nb_ecoutes_total: 1 })                  // A23 (titres jamais écoutés)
+db.playlists.createIndex({ proprietaire_id: 1 })                // T12 (playlists d'un utilisateur)
+db.playlists.createIndex({ publique: 1, nb_abonnes: -1 })       // A24 (playlists publiques populaires)
+
+db.listens.getIndexes()

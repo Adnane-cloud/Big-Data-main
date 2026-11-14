@@ -1,0 +1,20 @@
+// =============================================================================
+// 01 — Chargement des données (même principe que load("shop_maroc.js") dans le TP)
+// Le script donnees_streaming.js remet la base à zéro puis insère les documents
+// avec insertMany. On vérifie ensuite les volumes avec countDocuments.
+// =============================================================================
+
+load("/scripts/01_initialisation/donnees_streaming.js")
+
+show collections
+
+db.artists.countDocuments({})
+db.users.countDocuments({})
+db.tracks.countDocuments({})
+db.listens.countDocuments({})
+db.playlists.countDocuments({})
+
+// Un document de chaque collection
+db.users.findOne()
+db.tracks.findOne()
+db.listens.findOne({}, { _id: 0 })
